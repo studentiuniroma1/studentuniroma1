@@ -1,0 +1,1868 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dati Personali - INFOSTUD</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Aptos', 'Aptos Display', 'Aptos Narrow', 'Aptos Serif', sans-serif; /* Changed font to Aptos with fallbacks */
+            background-color: #ffffff; /* Sfondo cambiato a bianco */
+            padding-bottom: 60px; /* Padding per il footer fisso */
+            padding-top: 60px; /* Aggiunto padding per l'header fisso */
+        }
+        .main-container {
+            background-color: #ffffff;
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+            overflow: hidden; /* Assicura che gli angoli arrotondati si applichino correttamente ai figli */
+            flex-grow: 1; /* Permette al contenitore principale di occupare lo spazio rimanente */
+            margin-top: 0; /* Rimosso margin-top per spostare il contenuto più in alto */
+        }
+        .profile-section {
+            background-color: #822434; /* Rosso Sapienza cambiato */
+            color: #ffffff;
+        }
+        .info-card {
+            background-color: #ffffff;
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* Ombra sottile per le schede interne */
+        }
+        .header-top {
+            background-color: #bfbba6; /* Grigio chiaro cambiato */
+            color: #333;
+            position: fixed; /* Rende la barra fisso */
+            top: 0; /* La fissa in alto */
+            left: 0;
+            right: 0;
+            z-index: 20; /* Assicura che sia sopra gli altri contenuti */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Added subtle shadow */
+        }
+        .footer-menu {
+            background-color: #dcdbd7; /* Grigio chiaro per il footer cambiato */
+            color: #822434; /* Rosso Sapienza per le icone del footer cambiato */
+            position: fixed; /* Rende la barra fisso */
+            bottom: 0; /* La fissa in basso */
+            left: 0;
+            right: 0;
+            z-index: 20; /* Assicura che sia sopra gli altri contenuti */
+            display: flex; /* Assicurati che sia flex */
+            justify-content: space-around; /* Mantiene la distribuzione dello spazio */
+            align-items: flex-end; /* Allinea in basso */
+            height: 75px; /* Increased height by ~20% (was 60px) */
+            padding-bottom: 10px; /* Padding per il contenuto */
+        }
+        .footer-link {
+            color: #822434; /* Rosso Sapienza per le icone del footer cambiato */
+            transition: color 0.2s ease-in-out;
+            position: relative; /* Per posizionamento interno se necessario */
+            flex-grow: 1; /* Permette ai link di crescere */
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end; /* Allinea il contenuto in basso */
+            height: 100%; /* Occupa tutta l'altezza del footer */
+        }
+        .footer-link:hover {
+            color: #6a1d2b; /* Rosso più scuro al passaggio del mouse cambiato */
+        }
+        .icon-button {
+            background: none;
+            border: none;
+            color: #6b7280; /* Gray-500 */
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 0.25rem;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .icon-button:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        /* Stili per il menu laterale (ora non più a comparsa ma una pagina) */
+        .sidebar {
+            display: none; /* Hidden by default, now handled by showMainContentSection */
+        }
+        .sidebar.open {
+            display: none; /* Keep hidden as it's now a full page */
+        }
+        .sidebar-overlay {
+            display: none; /* Keep hidden as it's now a full page */
+        }
+
+        /* Stili per il calendario */
+        /* .calendar-modal is now .full-page-calendar-section */
+        .full-page-calendar-section {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            max-width: 400px; /* Adjusted for a smaller calendar */
+            margin: 0 auto; /* Center the calendar on the page */
+            width: 100%; /* Ensure it takes full width on mobile */
+        }
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: #333;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.2rem; /* Reduced gap for a more compact look */
+            text-align: center;
+        }
+        .calendar-day-name {
+            font-weight: 500;
+            color: #666;
+            font-size: 0.875rem;
+            padding: 0.5rem 0; /* Added padding for better spacing */
+        }
+        .calendar-day {
+            background-color: transparent; /* Changed to transparent for minimal look */
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            min-height: 40px; /* Assicura una dimensione minima per il tocco */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid transparent; /* Minimal border for definition */
+        }
+        .calendar-day:hover {
+            background-color: #f0f0f0; /* Light gray on hover */
+        }
+        .calendar-day.current-day {
+            background-color: #822434; /* Rosso cambiato */
+            color: #ffffff;
+            font-weight: 600;
+            border-color: #822434; /* Border matches background */
+        }
+        .calendar-day.empty {
+            background-color: transparent;
+            cursor: default;
+            border-color: transparent;
+        }
+        .calendar-day.exam-day {
+            background-color: #822434; /* Rosso highlight per i giorni d'esame cambiato */
+            color: #ffffff;
+            font-weight: 600;
+            cursor: pointer;
+            border-color: #822434; /* Border matches background */
+        }
+        .calendar-day.exam-day:hover {
+            background-color: #6a1d2b; /* Rosso più scuro al hover cambiato */
+            border-color: #6a1d2b;
+        }
+
+        /* Specific styles for the Home section to match the image */
+        .home-top-bar {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .home-nav-link {
+            color: #333;
+            font-weight: 500;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .home-nav-link:hover {
+            background-color: #f0f0f0; /* Un grigio chiaro al hover */
+        }
+        .home-icon-card {
+            background-color: #822434; /* Rosso cambiato */
+            color: #ffffff;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-weight: 500;
+            transition: background-color 0.2s ease-in-out;
+            cursor: pointer; /* Ensure it's clickable */
+        }
+        .home-icon-card:hover {
+            background-color: #6a1d2b; /* Rosso più scuro al hover cambiato */
+        }
+        .home-icon-card svg {
+            width: 3rem;
+            height: 3rem;
+            margin-bottom: 0.75rem;
+        }
+        /* Styles for the Carriera section to match the provided image */
+        .career-grid {
+            display: grid;
+            grid-template-columns: auto 1fr; /* Left column takes minimum content width, right takes rest */
+            gap: 0.5rem 5rem; /* Maintain large gap */
+            align-items: center;
+            background-color: #ffffff;
+            border-radius: 0;
+            box-shadow: none;
+            overflow: hidden;
+            padding: 0; /* Remove padding from the grid itself */
+            line-height: 1.5; /* Increased line spacing */
+        }
+        .career-label {
+            font-weight: normal; /* Rimosso grassetto */
+            color: #333; /* Darker text for labels */
+            text-align: left; /* Ensure left alignment */
+            white-space: nowrap; /* Prevent text from wrapping */
+        }
+        .career-value {
+            font-weight: bold; /* Reso grassetto */
+            color: #555; /* Slightly lighter text for values */
+            text-align: left; /* Ensure left alignment */
+            white-space: nowrap; /* Prevent text from wrapping */
+        }
+
+        /* Styles for the new Menu Page */
+        .menu-card {
+            background-color: #f0f0f0; /* Un grigio chiaro per lo sfondo */
+            border-radius: 0.75rem; /* Rounded corners for cards */
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            padding: 1.5rem; /* Increased padding for bigger buttons */
+            display: flex;
+            flex-direction: column; /* Stack title and subtitle */
+            align-items: flex-start; /* Allineato a sinistra */
+            justify-content: center; /* Centrato verticalmente */
+            text-align: left; /* Allineato a sinistra */
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            aspect-ratio: 1 / 1; /* Make it square */
+            min-height: 120px; /* Ensure a minimum size */
+        }
+        .menu-card:hover {
+            background-color: #e0e0e0; /* Un grigio più scuro al hover */
+        }
+        .menu-card-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem; /* Space between title and subtitle */
+        }
+        .menu-card-subtitle {
+            font-size: 0.875rem; /* Smaller font for subtitle */
+            color: #666;
+            line-height: 1.2;
+        }
+        .menu-card-arrow {
+            margin-top: 0.75rem; /* Space below subtitle */
+            align-self: flex-end; /* Sposta la freccia a destra */
+        }
+        .menu-card-arrow svg {
+            width: 1.5rem;
+            height: 1.5rem;
+            color: #822434; /* Rosso cambiato */
+        }
+
+        /* Specific style for the overlapping profile icon */
+        #profileFooterButton {
+            margin-top: -52.2px; /* Adjusted to move it higher for 12% increase */
+            z-index: 10; /* Ensure it's above the footer */
+            background-color: transparent; /* Make button background transparent */
+            border-radius: 50%; /* Make it circular for better visual */
+            padding: 0; /* Remove padding to let SVG control size */
+            width: 67.2px; /* Make the clickable area larger */
+            height: 67.2px; /* Make the clickable area larger */
+            display: flex;
+            justify-content: center;
+            align-items: center; /* Align content to the center of the button */
+            /* Removed transform for centering */
+        }
+        /* Removed #profileFooterButton img style as it's now an SVG */
+
+        /* Make calendar and menu buttons larger */
+        #calendarButton svg {
+            width: 36px; /* Increased size */
+            height: 36px; /* Increased size */
+        }
+        #menuFooterButton svg {
+            width: 45px; /* Further reduced size */
+            height: 45px; /* Further reduced size */
+            /* Removed transform for centering */
+        }
+
+
+        /* New styles for exam cards */
+        .exam-card {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            transition: transform 0.2s ease-in-out;
+        }
+        .exam-card:hover {
+            transform: translateY(-3px);
+        }
+        .exam-card-date {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #822434; /* Rosso cambiato */
+            text-align: center;
+            line-height: 1;
+            margin-right: 1rem;
+            flex-shrink: 0;
+            width: 4rem; /* Fixed width for date */
+        }
+        .exam-card-date span {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+        .exam-card-content {
+            flex-grow: 1;
+        }
+        .exam-card-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.125rem;
+            margin-bottom: 0.25rem;
+        }
+        .exam-card-details {
+            color: #555;
+            font-size: 0.9rem;
+        }
+        .exam-grade {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #10B981; /* Green for success */
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        /* New styles for contact cards */
+        .contact-card {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            transition: transform 0.2s ease-in-out;
+        }
+        .contact-card:hover {
+            transform: translateY(-3px);
+        }
+        .contact-card-title {
+            font-weight: 600;
+            color: #822434; /* Rosso cambiato */
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+        .contact-item-label {
+            font-weight: 500;
+            color: #333;
+            width: 100px; /* Fixed width for labels */
+            flex-shrink: 0;
+        }
+        .contact-item-value {
+            color: #555;
+            flex-grow: 1;
+        }
+
+        /* Modal styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-overlay.open {
+            display: flex;
+        }
+        .modal-content {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            position: relative;
+        }
+        .modal-close-button {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        /* Micro banner style */
+        .micro-banner-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1002; /* Higher than other modals */
+            display: none;
+            text-align: center;
+            font-weight: 600;
+            color: #333;
+            max-width: 280px;
+            width: 80%;
+        }
+        .micro-banner-modal.open {
+            display: block;
+        }
+
+        /* Adjust careerSection to move content higher and remove horizontal padding */
+        #careerSection {
+            padding-top: 0; /* Remove top padding for this section */
+            margin-top: -1.5rem; /* Pull it up further, counteracting mainContentArea's p-6 */
+            padding-left: 0; /* Remove left padding from the section */
+            padding-right: 0; /* Remove right padding from the section */
+        }
+
+        /* New styles for home mini profile picture */
+        /* Removed this style as the element is no longer present */
+    </style>
+</head>
+<body class="flex flex-col items-center min-h-screen">
+    <!-- Top Header Bar (Always visible and fixed) -->
+    <div class="header-top w-full py-2 px-4 flex items-center justify-between text-sm">
+        <div class="flex items-center space-x-2">
+            <!-- Left Arrow Icon - Now leads to previous page -->
+            <button id="backArrowButton" class="icon-button">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+            </button>
+            <span id="currentHeaderTitle">Home</span>
+        </div>
+        <div class="flex items-center space-x-4">
+            <!-- Ring Binder Notebook Icon (now first, leads to examsSection) -->
+            <button id="examsHeaderButton" class="icon-button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Notebook body (transparent page with border matching home icon) -->
+                    <rect x="5" y="3" width="14" height="18" rx="2" fill="#bfbba6" stroke="#6b7280" stroke-width="1.5"/>
+                    <!-- Lines inside the notebook -->
+                    <line x1="8.5" y1="6" x2="17.5" y2="6" stroke="#666" stroke-width="0.5"/>
+                    <line x1="8.5" y1="8" x2="17.5" y2="8" stroke="#666" stroke-width="0.5"/>
+                    <line x1="8.5" y1="10" x2="17.5" y2="10" stroke="#666" stroke-width="0.5"/>
+                    <line x1="8.5" y1="12" x2="17.5" y2="12" stroke="#666" stroke-width="0.5"/>
+                    <line x1="8.5" y1="14" x2="17.5" y2="14" stroke="#666" stroke-width="0.5"/>
+                    <line x1="8.5" y1="16" x2="17.5" y2="16" stroke="#666" stroke-width="0.5"/>
+                    <line x1="8.5" y1="18" x2="17.5" y2="18" stroke="#666" stroke-width="0.5"/>
+                    <!-- Rings -->
+                    <circle cx="7.5" cy="7" r="1.5" fill="none" stroke="#6b7280" stroke-width="1.5"/>
+                    <circle cx="7.5" cy="12" r="1.5" fill="none" stroke="#6b7280" stroke-width="1.5"/>
+                    <circle cx="7.5" cy="17" r="1.5" fill="none" stroke="#6b7280" stroke-width="1.5"/>
+                </svg>
+            </button>
+            <!-- Home Icon (now second) -->
+            <button id="homeHeaderButton" class="icon-button">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="w-full max-w-5xl main-container flex flex-col md:flex-row mt-4 mb-auto">
+        <!-- Left Profile Section - Conditionally visible -->
+        <div id="leftProfileColumn" class="md:w-1/3 profile-section flex flex-col items-center p-6 text-center">
+            <div class="w-32 h-32 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden border-4 border-white mb-4">
+                <!-- User Profile Picture -->
+                <img src="https://i.ibb.co/hx7gGmyh/Borz-Salvatore.jpg" alt="[Immagine del profilo di Salvatore Borzì]" class="w-full h-full object-cover">
+            </div>
+            <h2 class="text-xl font-semibold mb-2">SALVATORE BORZÌ</h2>
+            <div class="text-sm grid grid-cols-2 gap-y-2 gap-x-4 w-full max-w-xs">
+                <div class="flex flex-col items-center">
+                    <p class="font-medium">Matricola:</p>
+                    <p>LT0001265842</p>
+                </div>
+                <div class="flex flex-col items-center">
+                    <p class="font-medium">Codice Fiscale:</p>
+                    <p>BRZSV77E29G371L</p>
+                </div>
+                <div class="flex flex-col items-center">
+                    <p class="font-medium">Data di Nascita:</p>
+                    <p>29/05/1997</p>
+                </div>
+                <div class="flex flex-col items-center">
+                    <p class="font-medium">Luogo di Nascita:</p>
+                    <p>PATERNÒ (CT) - ITALIA</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Main Content Area - Dynamic content based on menu selection -->
+        <div id="mainContentArea" class="flex-1 p-6 space-y-6">
+
+            <!-- Home Section -->
+            <div id="homeSection" class="content-section hidden">
+                <!-- Top Bar similar to image_ae005e.jpg -->
+                <div class="home-top-bar py-4 px-6 flex flex-col md:flex-row items-center justify-between mb-6 rounded-md shadow-sm">
+                    <div class="flex items-center mb-4 md:mb-0">
+                        <!-- Sapienza Logo with updated alt text and responsive height -->
+                        <img src="https://simoneconcorsi.it/wp-content/uploads/2023/12/Concorso-laureati-Sapienza-Roma-2023.png" alt="[Immagine del logo dell'Università La Sapienza di Roma]" class="h-48 md:h-80 object-contain mr-4">
+                    </div>
+                    <nav class="flex flex-wrap justify-center md:justify-end gap-x-4 gap-y-2 text-sm">
+                        <a href="#" class="home-nav-link" data-section="studentsPage">STUDENTI</a>
+                        <a href="#" class="home-nav-link" data-section="graduatesPage">LAUREATI</a>
+                        <a href="#" class="home-nav-link" data-section="teachersPage">DOCENTI</a>
+                        <a href="#" class="home-nav-link" data-section="staffPage">PERSONALE</a>
+                        <a href="#" class="home-nav-link" data-section="contactsPage">CONTATTI</a>
+                        <div class="relative flex items-center">
+                            <input type="text" id="siteSearchInput" placeholder="cerca nel sito" class="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 absolute right-2 text-gray-500">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                            </svg>
+                        </div>
+                        <a href="#" class="home-nav-link flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 mr-1">
+                                <path fill-rule="evenodd" d="M10.5 3.75a6.75 6.75 0 100 13.5 6.75 6.75 0 000-13.5zM2.25 10.5a8.25 8.25 0 1114.59 5.28l4.697 4.698a1.5 1.5 0 01-2.12 2.122L12.75 15.75a8.25 8.25 0 01-10.5-5.25z" clip-rule="evenodd" />
+                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
+                                <path fill-rule="evenodd" d="M7.5 6a.75.75 0 01.75-.75h7.5a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V7.5h-6v1.5a.75.75 0 01-1.5 0V6zm-3.75 4.5a.75.75 0 01.75-.75h15a.75.75 0 01.75.75v4.5a.75.75 0 01-.75.75H4.5a.75.75 0 01-.75-.75v-4.5zM4.5 16.5a.75.75 0 01.75-.75h15a.75.75 0 01.75.75V18a.75.75 0 01-.75.75H4.5a.75.75 0 01-.75-.75v-1.5z" clip-rule="evenodd" />
+                            </svg>
+                            IT
+                        </a>
+                    </nav>
+                </div>
+
+                <div class="flex flex-col md:flex-row justify-end space-y-2 md:space-y-0 md:space-x-4 mb-6">
+                    <button class="bg-gray-200 text-gray-800 py-2 px-4 rounded-md shadow-sm hover:bg-gray-300 transition-colors">Desktop</button>
+                    <button class="bg-gray-200 text-gray-800 py-2 px-4 rounded-md shadow-sm hover:bg-gray-300 transition-colors">Mobile</button>
+                </div>
+
+                <!-- Icon Grid Section -->
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+                    <a href="#" class="home-icon-card" data-section="contactsSection">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063 0l.041.02m-.172 6.903a2.25 2.25 0 002.244-2.077l.138-.87C18.885 11.87 18.729 10.29 18 8.75c-.725-1.54-1.636-3.047-2.914-4.326l-.822-.822A2.25 2.25 0 0010.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-2.25-6.75V15.75" />
+                        </svg>
+                        CIAO E URP
+                    </a>
+                    <a href="#" class="home-icon-card" data-section="emailSection">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 9.75v7.5a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 17.25v-7.5M21.75 9A2.25 2.25 0 0019.5 6.75H4.5A2.25 2.25 0 002.25 9v.75m19.5 0a3 3 0 01-3 3H5.25a3 3 0 01-3-3m19.5 0V9m-12 5.25v3m-3-3v3m-3-3v3M9 15.75H6m3 0h3m-3 0h3" />
+                        </svg>
+                        EMAIL
+                    </a>
+                    <a href="#" class="home-icon-card" data-section="graduationSection">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347m6.718-5.182L13.499 17.5l-1.392 1.392m3.08-10.492a60.436 60.436 0 00-1.362-3.876m-.042-.042V4.5m-.75 2.25c.054-.116.11-.228.167-.34l1.299-2.598a1.125 1.125 0 011.945 0l1.299 2.598c.057.112.113.224.167.34m-1.5 1.5l.041-.02a.75.75 0 011.063 0l.041.02M10.5 6H6.912a2.25 2.25 0 00-2.15 1.588L2.25 17.525V18a2.25 2.25 0 002.25 2.25h15.5a2.25 2.25 0 002.25-2.25v-.475L19.238 7.588A2.25 2.25 0 0017.088 6H13.5" />
+                        </svg>
+                        LAUREARSI
+                    </a>
+                    <a href="#" class="home-icon-card" data-section="abroadSection">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        ANDARE ALL'ESTERO
+                    </a>
+                    <a href="#" class="home-icon-card" data-section="dsaSection">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 11.25l-3-3m0 0l-3 3m3-3v7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        DISABILITÀ E DSA
+                    </a>
+                    <a href="#" class="home-icon-card" data-section="azetaSection">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                        </svg>
+                        AZETA STUDENTI
+                    </a>
+                </div>
+
+                <!-- News/Articles Section -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="info-card p-4">
+                        <img src="https://www.partitaiva.it/wp-content/uploads/2025/05/borse-studio-2025-2026.webp" alt="[Immagine di Borse di Studio]" class="w-full rounded-md mb-3">
+                        <h4 class="font-semibold text-gray-800 mb-2">MUR CRUI: 100 borse di studio a studenti con protezione internazionale (scadenza 10 agosto)</h4>
+                        <p class="text-sm text-gray-600">Dettagli sulla borsa di studio per studenti internazionali...</p>
+                        <a href="#" class="text-blue-600 hover:underline text-sm mt-2 block" data-section="newsArticle1">Leggi di più</a>
+                    </div>
+                    <div class="info-card p-4">
+                        <img src="https://il-cubo.it/images/Servizio1-orientamento.jpg" alt="[Immagine di Orientamento]" class="w-full rounded-md mb-3">
+                        <h4 class="font-semibold text-gray-800 mb-2">Catalogo delle competenze trasversali, di orientamento al lavoro e imprenditoriali</h4>
+                        <p class="text-sm text-gray-600">Scopri i corsi e le opportunità per migliorare le tue competenze...</p>
+                        <a href="#" class="text-blue-600 hover:underline text-sm mt-2 block" data-section="newsArticle2">Leggi di più</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nuove Sezioni per i link della Top Bar -->
+            <div id="studentsPage" class="content-section hidden">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Sezione Studenti</h2>
+                <div class="info-card p-4">
+                    <p class="text-gray-700">Qui trovi tutte le informazioni utili per gli studenti: guide, servizi, opportunità e bandi.</p>
+                    <ul class="list-disc list-inside text-gray-700 mt-4 space-y-2">
+                        <li><a href="#" class="text-blue-600 hover:underline">Guida dello Studente</a></li>
+                        <li><a href="#" class="text-blue-600 hover:underline">Servizi Online per Studenti</a></li>
+                        <li><a href="#" class="text-blue-600 hover:underline">Opportunità di Tirocinio</a></li>
+                    </ul>
+                </div>
+                <div class="info-card p-4 mt-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Eventi per Studenti</h3>
+                    <p class="text-gray-700">Non perdere i prossimi eventi dedicati a te!</p>
+                    <ul class="list-disc list-inside text-gray-700 mt-2 space-y-1">
+                        <li>Webinar: "Prepararsi agli Esami" - 20 Luglio 2025</li>
+                        <li>Open Day Facoltà - 10 Settembre 2025</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="graduatesPage" class="content-section hidden">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Sezione Laureati</h2>
+                <div class="info-card p-4">
+                    <p class="text-gray-700">Scopri i servizi dedicati ai laureati: placement, alumni network e opportunità di carriera.</p>
+                    <ul class="list-disc list-inside text-gray-700 mt-4 space-y-2">
+                        <li><a href="#" class="text-blue-600 hover:underline">Servizio Placement</a></li>
+                        <li><a href="#" class="text-blue-600 hover:underline">Rete Alumni Sapienza</a></li>
+                        <li><a href="#" class="text-blue-600 hover:underline">Offerte di Lavoro</a></li>
+                    </ul>
+                </div>
+                <div class="info-card p-4 mt-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Eventi per Laureati</h3>
+                    <p class="text-gray-700">Partecipa ai nostri eventi per ex-studenti!</p>
+                    <ul class="list-disc list-inside text-gray-700 mt-2 space-y-1">
+                        <li>Career Day - 15 Ottobre 2025</li>
+                        <li>Incontro con i Professionisti - 5 Novembre 2025</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="teachersPage" class="content-section hidden">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Sezione Docenti</h2>
+                <div class="info-card p-4">
+                    <p class="text-gray-700">Risorse e strumenti per il corpo docente: didattica, ricerca e gestione amministrativa.</p>
+                    <ul class="list-disc list-inside text-gray-700 mt-4 space-y-2">
+                        <li><a href="#" class="text-blue-600 hover:underline">Portale Didattica</a></li>
+                        <li><a href="#" class="text-blue-600 hover:underline">Bandi di Ricerca</a></li>
+                        <li><a href="#" class="text-blue-600 hover:underline">Modulistica Docenti</a></li>
+                    </ul>
+                </div>
+                <div class="info-card p-4 mt-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">News per Docenti</h3>
+                    <p class="text-gray-700">Aggiornamenti e comunicazioni importanti.</p>
+                    <ul class="list-disc list-inside text-gray-700 mt-2 space-y-1">
+                        <li>Nuove Linee Guida per la Valutazione - 1 Luglio 2025</li>
+                        <li>Conferenza Internazionale sulla Ricerca - 22 Settembre 2025</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="staffPage" class="content-section hidden">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Sezione Personale</h2>
+                <div class="info-card p-4">
+                    <p class="text-gray-700">Informazioni e servizi per il personale tecnico-amministrativo: normativa, formazione e benefit.</p>
+                    <ul class="list-disc list-inside text-gray-700 mt-4 space-y-2">
+                        <li><a href="#" class="text-blue-600 hover:underline">Regolamenti Interni</a></li>
+                        <li><a href="#" class="text-blue-600 hover:underline">Corsi di Formazione</a></li>
+                        <li><a href="#" class="text-blue-600 hover:underline">Servizi per il Personale</a></li>
+                    </ul>
+                </div>
+                <div class="info-card p-4 mt-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Comunicazioni Interne</h3>
+                    <p class="text-gray-700">Aggiornamenti e avvisi per tutto il personale.</p>
+                    <ul class="list-disc list-inside text-gray-700 mt-2 space-y-1">
+                        <li>Nuove Procedure Amministrative - 10 Luglio 2025</li>
+                        <li>Incontro del Personale - 28 Agosto 2025</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="contactsPage" class="content-section hidden">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Contatti dell'Ateneo</h2>
+                <div class="grid grid-cols-1 gap-4">
+                    <div class="contact-card">
+                        <div class="contact-card-title">Ufficio Relazioni con il Pubblico (URP)</div>
+                        <div class="contact-item">
+                            <div class="contact-item-label">Telefono:</div>
+                            <div class="contact-item-value">+39 06 4991 xxxx</div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-item-label">Email:</div>
+                            <div class="contact-item-value">urp@uniroma1.it</div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-item-label">Orari:</div>
+                            <div class="contact-item-value">Dal Lunedì al Venerdì, 9:00 - 13:00</div>
+                        </div>
+                    </div>
+                    <div class="contact-card">
+                        <div class="contact-card-title">Ufficio Tasse e Contributi</div>
+                        <div class="contact-item">
+                            <div class="contact-item-label">Telefono:</div>
+                            <div class="contact-item-value">+39 06 4991 xxxx</div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-item-label">Email:</div>
+                            <div class="contact-item-value">tasse@uniroma1.it</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nuove Sezioni per le Notizie -->
+            <div id="newsArticle1" class="content-section hidden">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">MUR CRUI: 100 borse di studio a studenti con protezione internazionale</h2>
+                <div class="info-card p-4">
+                    <img src="https://www.partitaiva.it/wp-content/uploads/2025/05/borse-studio-2025-2026.webp" alt="[Immagine di Borse di Studio]" class="w-full rounded-md mb-4">
+                    <p class="text-gray-700 mb-4">
+                        Il Ministero dell'Università e della Ricerca (MUR) in collaborazione con la Conferenza dei Rettori delle Università Italiane (CRUI)
+                        ha annunciato un bando per l'assegnazione di 100 borse di studio a studenti e studentesse con protezione internazionale.
+                        L'iniziativa mira a promuovere l'accesso all'istruzione superiore e l'inclusione sociale.
+                    </p>
+                    <p class="text-gray-700 mb-4">
+                        Le borse di studio copriranno le tasse universitarie, l'alloggio, un contributo mensile per le spese di mantenimento e il supporto linguistico.
+                        La scadenza per la presentazione delle domande è fissata al **10 agosto 2025**.
+                    </p>
+                    <p class="text-gray-700">
+                        Per maggiori dettagli sui requisiti e le modalità di partecipazione, si prega di consultare il bando completo sul sito del MUR o della CRUI.
+                    </p>
+                    <a href="#" class="text-blue-600 hover:underline text-sm mt-4 block" onclick="showMainContentSection('homeSection'); return false;">Torna alla Home</a>
+                </div>
+            </div>
+
+            <div id="newsArticle2" class="content-section hidden">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Catalogo delle competenze trasversali, di orientamento al lavoro e imprenditoriali</h2>
+                <div class="info-card p-4">
+                    <img src="https://il-cubo.it/images/Servizio1-orientamento.jpg" alt="[Immagine di Orientamento]" class="w-full rounded-md mb-4">
+                    <p class="text-gray-700 mb-4">
+                        La Sapienza Università di Roma ha pubblicato il nuovo "Catalogo delle competenze trasversali, di orientamento al lavoro e imprenditoriali",
+                        uno strumento innovativo per supportare gli studenti nello sviluppo di soft skills sempre più richieste dal mondo del lavoro.
+                    </p>
+                    <p class="text-gray-700 mb-4">
+                        Il catalogo include una vasta gamma di corsi, workshop e attività formative su temi quali comunicazione efficace, problem solving,
+                        lavoro di squadra, pensiero critico, digital skills e imprenditorialità. L'obiettivo è fornire agli studenti gli strumenti
+                        necessari per affrontare con successo le sfide del mercato occupazionale e avviare nuove iniziative.
+                    </p>
+                    <p class="text-gray-700">
+                        Consulta il catalogo completo per scoprire le opportunità formative disponibili e iscriviti ai corsi di tuo interesse.
+                    </p>
+                    <a href="#" class="text-blue-600 hover:underline text-sm mt-4 block" onclick="showMainContentSection('homeSection'); return false;">Torna alla Home</a>
+                </div>
+            </div>
+
+            <!-- Placeholder Sections for Home Buttons -->
+            <div id="emailSection" class="content-section hidden">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">La tua Email Istituzionale</h2>
+                <div class="grid grid-cols-1 gap-4">
+                    <div class="info-card p-4">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Dettagli Account</h3>
+                        <p class="text-gray-700 mb-2"><strong class="font-medium">Indirizzo Email:</strong> borzi.LT0001265842@studenti.uniroma1.it</p>
+                        <p class="text-gray-700 mb-4">La tua email istituzionale è il canale ufficiale di comunicazione con l'Ateneo.</p>
+                        <a href="https://mail.google.com/a/studenti.uniroma1.it" target="_blank" class="text-blue-600 hover:underline font-medium">Accedi alla Webmail</a>
+                    </div>
+                    <div class="info-card p-4">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">FAQ Email Istituzionale</h3>
+                        <ul class="list-disc list-inside text-gray-700 space-y-1">
+                            <li>Come reimpostare la password?</li>
+                            <li>Come configurare l'email su smartphone?</li>
+                            <li>Qual è lo spazio di archiviazione disponibile?</li>
+                        </ul>
+                        <p class="mt-4 text-gray-600 text-sm">Per maggiori informazioni, consulta la <a href="#" class="text-blue-600 hover:underline">guida completa all'email istituzionale</a>.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="graduationSection" class="content-section hidden">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Informazioni per Laurearsi</h2>
+                <div class="grid grid-cols-1 gap-4">
+                    <div class="info-card p-4">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Requisiti di Laurea</h3>
+                        <p class="text-gray-700 mb-2">Assicurati di aver completato tutti gli esami e i crediti formativi necessari.</p>
+                        <p class="text-gray-600 text-sm">Controlla il tuo piano di studi su Infostud.</p>
+                    </div>
+                    <div class="info-card p-4">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Sessioni di Laurea</h3>
+                        <p class="text-gray-700 mb-2">Consulta il calendario delle sessioni di laurea per l'anno accademico in corso.</p>
+                        <p class="text-gray-600 text-sm">Le iscrizioni si aprono circa 3 mesi prima della data.</p>
+                    </div>
+                    <div class="info-card p-4">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Modulistica e Tesi</h3>
+                        <p class="text-gray-700 mb-2">Scarica i moduli necessari e le linee guida per la stesura e la consegna della tesi.</p>
+                        <p class="text-gray-600 text-sm">Ricorda di rispettare le scadenze per evitare ritardi.</p>
+                    </div>
+                    <div class="info-card p-4">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Cerimonia di Laurea</h3>
+                        <p class="text-gray-700 mb-2">Informazioni sulla data, l'orario e le modalità della cerimonia di proclamazione.</p>
+                        <p class="text-gray-600 text-sm">Un momento speciale da condividere con amici e famiglia.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="abroadSection" class="content-section hidden">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Esperienze all'Estero</h2>
+                <div class="grid grid-cols-1 gap-4">
+                    <div class="info-card p-4">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Programmi di Scambio (Erasmus+)</h3>
+                        <p class="text-gray-700 mb-2">Scopri le destinazioni disponibili e i requisiti per partecipare al programma Erasmus+.</p>
+                        <p class="text-gray-600 text-sm">Un'opportunità unica per studiare in Europa.</p>
+                    </div>
+                    <div class="info-card p-4">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Bandi e Scadenze</h3>
+                        <p class="text-gray-700 mb-2">Tieni d'occhio i bandi per le borse di studio e le scadenze per le candidature.</p>
+                        <p class="text-gray-600 text-sm">Non perdere l'occasione di finanziare la tua esperienza all'estero.</p>
+                    </div>
+                    <div class="info-card p-4">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Testimonianze Studenti</h3>
+                        <p class="text-gray-700 mb-2">Leggi le esperienze di altri studenti che hanno studiato all'estero.</p>
+                        <p class="text-gray-600 text-sm">Lasciati ispirare dalle loro avventure!</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="dsaSection" class="content-section hidden">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Supporto per Disabilità e DSA</h2>
+                <div class="grid grid-cols-1 gap-4">
+                    <div class="info-card p-4">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Servizi Offerti</h3>
+                        <p class="text-gray-700 mb-2">Scopri i servizi di supporto didattico, tecnologico e personale disponibili.</p>
+                        <p class="text-gray-600 text-sm">Siamo qui per garantirti un percorso di studi sereno.</p>
+                    </div>
+                    <div class="info-card p-4">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Come Richiedere Supporto</h3>
+                        <p class="text-gray-700 mb-2">Informazioni sulla procedura per richiedere i servizi e la documentazione necessaria.</p>
+                        <p class="text-gray-600 text-sm">Il nostro team ti guiderà passo dopo passo.</p>
+                    </div>
+                    <div class="info-card p-4">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Contatti Ufficio</h3>
+                        <p class="text-gray-700 mb-2">Contatta l'Ufficio Disabilità e DSA per qualsiasi domanda o necessità.</p>
+                        <p class="text-gray-600 text-sm">Siamo a tua completa disposizione.</p>
+                    </div>
+                    <!-- New section for G.B. -->
+                    <div class="info-card p-4 bg-gray-50 border border-gray-200">
+                        <h3 class="text-lg font-semibold text-[#822434] mb-2">Un Esempio di Determinazione: G.B.</h3>
+                        <p class="text-[#822434] mb-2">
+                            La Sapienza è orgogliosa di supportare studenti come G.B., un esempio di dedizione e perseveranza.
+                            Nonostante le sfide, la sua tenacia e il suo impegno costante gli hanno permesso di superare ogni ostacolo,
+                            dimostrando che con il giusto supporto e una forte volontà, ogni traguardo è raggiungibile.
+                        </p>
+                        <p class="text-[#822434] text-sm">
+                            La sua storia è un'ispirazione per tutta la comunità universitaria.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="azetaSection" class="content-section hidden">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">AZETA Studenti</h2>
+                <div class="grid grid-cols-1 gap-4">
+                    <div class="info-card p-4">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Attività e Eventi</h3>
+                        <p class="text-gray-700 mb-2">Partecipa a workshop, seminari, eventi culturali e sportivi organizzati da AZETA.</p>
+                        <p class="text-gray-600 text-sm">Arricchisci la tua vita universitaria!</p>
+                    </div>
+                    <div class="info-card p-4">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Orientamento e Carriera</h3>
+                        <p class="text-gray-700 mb-2">Servizi di orientamento per aiutarti a scegliere il percorso di studi e a pianificare la tua carriera.</p>
+                        <p class="text-gray-600 text-sm">Il tuo futuro inizia qui.</p>
+                    </div>
+                    <div class="info-card p-4">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Vantaggi e Convenzioni</h3>
+                        <p class="text-gray-700 mb-2">Scopri le convenzioni e gli sconti dedicati agli studenti AZETA.</p>
+                        <p class="text-gray-600 text-sm">Approfitta dei benefit esclusivi!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Section (existing content) -->
+            <div id="profileSection" class="content-section hidden">
+                <!-- Cittadinanze Card -->
+                <div class="p-4 info-card">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Cittadinanze</h3>
+                    <div class="flex justify-between items-center text-gray-700">
+                        <p>ITALIANA</p>
+                        <button class="icon-button" aria-label="Modifica Cittadinanza">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 001.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14.25v4.5m-2.25-2.25h4.5" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Recapiti Card -->
+                <div class="p-4 info-card">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Recapiti</h3>
+                    <div class="space-y-3 text-gray-700">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-medium">RESIDENZA:</p>
+                                <p>Via della Libertà 92 PATERNÒ 95047 - ITALIA</p>
+                            </div>
+                            <button class="icon-button" aria-label="Modifica Residenza">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 001.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14.25v4.5m-2.25-2.25h4.5" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-medium">DOMICILIO:</p>
+                                <p>Via della Libertà 92 PATERNÒ 95047 - ITALIA</p>
+                            </div>
+                            <button class="icon-button" aria-label="Modifica Domicilio">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 001.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14.25v4.5m-2.25-2.25h4.5" />
+                                </svg>
+                            </button>
+                        </div>
+                        <button class="text-sm font-medium text-gray-600 hover:text-gray-800 transition-colors">Aggiungi recapito</button>
+                    </div>
+                </div>
+
+                <!-- Contatti Card -->
+                <div class="p-4 info-card">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Contatti</h3>
+                    <div class="space-y-3 text-gray-700">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-medium">CELLULARE:</p>
+                                <p>346103003</p>
+                            </div>
+                            <button class="icon-button" aria-label="Modifica Numero Cellulare">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 001.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14.25v4.5m-2.25-2.25h4.5" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-medium">EMAIL PERSONALE:</p>
+                                <p>ovlas64.sb@gmail.com</p>
+                            </div>
+                            <button class="icon-button" aria-label="Modifica Email Personale">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 001.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14.25v4.5m-2.25-2.25h4.5" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-medium">EMAIL ISTITUZIONALE:</p>
+                                <p>borzi.LT0001265842@studenti.uniroma1.it</p>
+                            </div>
+                            <button class="icon-button" aria-label="Modifica Email Istituzionale">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 001.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14.25v4.5m-2.25-2.25h4.5" />
+                                </svg>
+                            </button>
+                        </div>
+                        <button class="text-sm font-medium text-gray-600 hover:text-gray-800 transition-colors">Aggiungi contatto</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carriera Section (updated design) -->
+            <div id="careerSection" class="content-section hidden">
+                <!-- Rimosso h2 "La tua Carriera Universitaria" -->
+                <div class="career-grid text-sm text-gray-700">
+                    <div class="career-label">Anno corso</div>
+                    <div class="career-value">1</div>
+                    <div class="career-label">Tipo corso</div>
+                    <div class="career-value">In Corso</div>
+                    <div class="career-label">Anno accademico</div>
+                    <div class="career-value">2026</div>
+                    <div class="career-label">Prima iscrizione</div>
+                    <div class="career-value">2024/2025</div>
+                    <div class="career-label">Ultima iscrizione</div>
+                    <div class="career-value">2024/2025</div>
+                    <div class="career-label">Facoltà</div>
+                    <div class="career-value">Lettere e Filosofia</div>
+                    <div class="career-label">Nome corso</div>
+                    <div class="career-value">Storia dell'Arte</div>
+                    <div class="career-label">Codice corso</div>
+                    <div class="career-value">33558</div>
+                </div>
+            </div>
+
+            <!-- Esami Section -->
+            <div id="examsSection" class="content-section hidden">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Sezione Esami</h2>
+                <div class="p-4 info-card">
+                    <p class="text-gray-700 mb-4">
+                        Qui puoi consultare il calendario degli appelli d'esame, iscriverti agli esami e visualizzare i risultati.
+                    </p>
+                    <ul class="list-disc list-inside space-y-2 text-gray-700">
+                        <li><a href="#" id="examCalendarLink" class="text-blue-600 hover:underline">Calendario Appelli</a></li>
+                        <li><a href="#" id="examRegistrationLink" class="text-blue-600 hover:underline">Iscrizione Esami</a></li>
+                        <li><a href="#" id="resultsBoardLink" class="text-blue-600 hover:underline">Bacheca Risultati</a></li>
+                    </ul>
+                    <p class="mt-4 text-gray-600 text-sm">Ricorda di controllare regolarmente le date e le scadenze.</p>
+                </div>
+            </div>
+
+            <!-- Nuova Sezione: Calendario Appelli -->
+            <div id="examCalendarSection" class="content-section hidden">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Calendario Appelli d'Esame</h2>
+                <div class="grid grid-cols-1 gap-4">
+                    <!-- Exam Card 1 -->
+                    <div class="exam-card">
+                        <div class="exam-card-date">
+                            15<span>Lug</span>
+                        </div>
+                        <div class="exam-card-content">
+                            <div class="exam-card-title">Storia delle Caccole Medievali</div>
+                            <div class="exam-card-details">Aula Magna, ore 09:00</div>
+                        </div>
+                    </div>
+                    <!-- Exam Card 2 -->
+                    <div class="exam-card">
+                        <div class="exam-card-date">
+                            22<span>Lug</span>
+                        </div>
+                        <div class="exam-card-content">
+                            <div class="exam-card-title">Teoria del Rutto Libero</div>
+                            <div class="exam-card-details">Laboratorio B, ore 14:30</div>
+                        </div>
+                    </div>
+                    <!-- Exam Card 3 -->
+                    <div class="exam-card">
+                        <div class="exam-card-date">
+                            05<span>Ago</span>
+                        </div>
+                        <div class="exam-card-content">
+                            <div class="exam-card-title">Filosofia del Sonno Profondo</div>
+                            <div class="exam-card-details">Online, ore 10:00</div>
+                        </div>
+                    </div>
+                    <!-- Exam Card 4 -->
+                    <div class="exam-card">
+                        <div class="exam-card-date">
+                            12<span>Set</span>
+                        </div>
+                        <div class="exam-card-content">
+                            <div class="exam-card-title">Archeologia dei Calzini Spaiati</div>
+                            <div class="exam-card-details">Aula 5, ore 11:00</div>
+                        </div>
+                    </div>
+                    <!-- Exam Card 5 -->
+                    <div class="exam-card">
+                        <div class="exam-card-date">
+                            20<span>Set</span>
+                        </div>
+                        <div class="exam-card-content">
+                            <div class="exam-card-title">Metodologie della Siesta Perfetta</div>
+                            <div class="exam-card-details">Sala Studio, ore 16:00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nuova Sezione: Iscrizione Esami -->
+            <div id="examRegistrationSection" class="content-section hidden">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Esami a cui sei iscritto</h2>
+                <div class="grid grid-cols-1 gap-4">
+                    <!-- Enrolled Exam Card 1 -->
+                    <div class="exam-card">
+                        <div class="exam-card-content">
+                            <div class="exam-card-title">Frode storica 1</div>
+                            <div class="exam-card-details">Iscritto - Prossimo Appello: 25 Settembre 2025</div>
+                        </div>
+                        <button class="bg-[#822434] hover:bg-[#6a1d2b] text-white font-bold py-2 px-4 rounded-md text-sm transition-colors cancel-enrollment-button">
+                            Annulla Iscrizione
+                        </button>
+                    </div>
+                    <!-- Enrolled Exam Card 2 -->
+                    <div class="exam-card">
+                        <div class="exam-card-content">
+                            <div class="exam-card-title">Galera 2</div>
+                        <div class="exam-card-details">Iscritto - Prossimo Appello: 10 Ottobre 2025</div>
+                        </div>
+                        <button class="bg-[#822434] hover:bg-[#6a1d2b] text-white font-bold py-2 px-4 rounded-md text-sm transition-colors cancel-enrollment-button">
+                            Annulla Iscrizione
+                        </button>
+                    </div>
+                    <!-- Enrolled Exam Card 3 -->
+                    <div class="exam-card">
+                        <div class="exam-card-content">
+                            <div class="exam-card-title">Reato civile 7</div>
+                            <div class="exam-card-details">Iscritto - Prossimo Appello: 20 Ottobre 2025</div>
+                        </div>
+                        <button class="bg-[#822434] hover:bg-[#6a1d2b] text-white font-bold py-2 px-4 rounded-md text-sm transition-colors cancel-enrollment-button">
+                            Annulla Iscrizione
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nuova Sezione: Bacheca Risultati -->
+            <div id="resultsBoardSection" class="content-section hidden">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Bacheca Risultati Esami</h2>
+                <div class="grid grid-cols-1 gap-4">
+                    <!-- Result Card 1 -->
+                    <div class="exam-card">
+                        <div class="exam-card-content">
+                            <div class="exam-card-title">Scorregge2</div>
+                            <div class="exam-card-details">Data Esame: 10 Giugno 2025</div>
+                        </div>
+                        <div class="exam-grade">30L</div>
+                    </div>
+                    <!-- Result Card 2 -->
+                    <div class="exam-card">
+                        <div class="exam-card-content">
+                            <div class="exam-card-title">Ruttoni3</div>
+                            <div class="exam-card-details">Data Esame: 18 Maggio 2025</div>
+                        </div>
+                        <div class="exam-grade">30L</div>
+                    </div>
+                    <!-- Result Card 3 -->
+                    <div class="exam-card">
+                        <div class="exam-card-content">
+                            <div class="exam-card-title">Dormito9h</div>
+                            <div class="exam-card-details">Data Esame: 5 Aprile 2025</div>
+                        </div>
+                        <div class="exam-grade">30L</div>
+                    </div>
+                    <!-- Result Card 4 -->
+                    <div class="exam-card">
+                        <div class="exam-card-content">
+                            <div class="exam-card-title">Storia dei Meme Antichi</div>
+                            <div class="exam-card-details">Data Esame: 2 Febbraio 2025</div>
+                        </div>
+                        <div class="exam-grade">30L</div>
+                    </div>
+                    <!-- Result Card 5 -->
+                    <div class="exam-card">
+                        <div class="exam-card-content">
+                            <div class="exam-card-title">Geografia delle Nuvole</div>
+                            <div class="exam-card-details">Data Esame: 15 Gennaio 2025</div>
+                        </div>
+                        <div class="exam-grade">30L</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tasse Section -->
+            <div id="feesSection" class="content-section hidden">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Pagamento Contributi Universitari</h2>
+                <div class="p-4 info-card">
+                    <p class="text-gray-700 mb-4">
+                        In questa sezione puoi visualizzare lo stato dei tuoi pagamenti e procedere al saldo dei contributi universitari.
+                    </p>
+                    <div class="flex flex-col space-y-3">
+                        <p><strong class="font-medium">Stato Tasse:</strong> In regola</p>
+                        <p><strong class="font-medium">Prossima Scadenza:</strong> 30 Settembre 2025</p>
+                        <p><strong class="font-medium">Importo dovuto:</strong> € 1.500,00</p>
+                        <button id="payNowButton" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors shadow-md">
+                            Paga Ora
+                        </button>
+                    </div>
+                    <p class="mt-4 text-gray-600 text-sm">Per maggiori dettagli, consulta la guida al pagamento delle tasse.</p>
+                </div>
+            </div>
+
+            <!-- Segreteria Section -->
+            <div id="secretariatSection" class="content-section hidden">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Contatti Segreteria Studenti</h2>
+                <div class="grid grid-cols-1 gap-4">
+                    <div class="contact-card">
+                        <div class="contact-card-title">Informazioni Generali</div>
+                        <div class="contact-item">
+                            <div class="contact-item-label">Orari:</div>
+                            <div class="contact-item-value">Lunedì, Mercoledì, Venerdì dalle 9:00 alle 12:00</div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-item-label">Telefono:</div>
+                            <div class="contact-item-value">+39 06 4991 xxxx</div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-item-label">Email:</div>
+                            <div class="contact-item-value">segreteria.lettere@uniroma1.it</div>
+                        </div>
+                        <p class="mt-2 text-gray-600 text-sm">Si consiglia di prenotare un appuntamento tramite Infostud.</p>
+                    </div>
+
+                    <div class="contact-card">
+                        <div class="contact-card-title">Preside Facoltà</div>
+                        <div class="contact-item">
+                            <div class="contact-item-label">Nome:</div>
+                            <div class="contact-item-value">Prof. ssa Arianna Punzi</div>
+                        </div>
+                    </div>
+
+                    <div class="contact-card">
+                        <div class="contact-card-title">Scuola di Specializzazione in Beni Storico Artistici</div>
+                        <div class="contact-item">
+                            <div class="contact-item-label">Direttore:</div>
+                            <div class="contact-item-value">Prof.ssa Carla Subrizi</div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-item-label">Email:</div>
+                            <div class="contact-item-value"><a href="mailto:carla.subrizi@uniroma1.it" class="text-blue-600 hover:underline">carla.subrizi@uniroma1.it</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contatti Section -->
+            <div id="contactsSection" class="content-section hidden">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Contatti Generali dell'Ateneo</h2>
+                <div class="grid grid-cols-1 gap-4">
+                    <div class="contact-card">
+                        <div class="contact-card-title">Informazioni Generali</div>
+                        <div class="contact-item">
+                            <div class="contact-item-label">Centralino:</div>
+                            <div class="contact-item-value">+39 06 49911</div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-item-label">PEC:</div>
+                            <div class="contact-item-value">protocollosapienza@cert.uniroma1.it</div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-item-label">URP:</div>
+                            <div class="contact-item-value">urp@uniroma1.it</div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-item-label">Sede Legale:</div>
+                            <div class="contact-item-value">Piazzale Aldo Moro, 5 - 00185 Roma</div>
+                        </div>
+                    </div>
+
+                    <div class="contact-card">
+                        <div class="contact-card-title">Segreteria Didattica della Scuola</div>
+                        <div class="contact-item">
+                            <div class="contact-item-label">Email:</div>
+                            <div class="contact-item-value"><a href="mailto:dalila.formisano@uniroma1.it" class="text-blue-600 hover:underline">dalila.formisano@uniroma1.it</a></div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-item-label">Indirizzo:</div>
+                            <div class="contact-item-value">Facoltà di Lettere e Filosofia, Dipartimento di Storia Antropologia Religioni Arte Spettacolo_Sezione Arte - primo piano, stanza 15</div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-item-label">Ricevimento:</div>
+                            <div class="contact-item-value">su appuntamento</div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-item-label">Telefono:</div>
+                            <div class="contact-item-value">06/49693279 int. 33279</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- New Menu Page Section -->
+            <div id="menuPageSection" class="content-section hidden">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6">Menu</h2>
+                <!-- Changed grid-cols-2 for mobile layout -->
+                <div class="grid grid-cols-2 md:grid-cols-2 gap-4">
+                    <div class="menu-card" data-section="profileSection">
+                        <span class="menu-card-title">Dati personali</span>
+                        <p class="menu-card-subtitle">Visualizza e modifica le tue informazioni anagrafiche e di contatto.</p>
+                        <span class="menu-card-arrow">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="menu-card" data-section="careerSection">
+                        <span class="menu-card-title">Carriera</span>
+                        <p class="menu-card-subtitle">Consulta il tuo percorso di studi, iscrizioni e dati accademici.</p>
+                        <span class="menu-card-arrow">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="menu-card" data-section="examsSection">
+                        <span class="menu-card-title">Esami</span> <!-- Changed from "Esami e statistiche" -->
+                        <p class="menu-card-subtitle">Gestisci gli esami, consulta i risultati e le statistiche sul tuo rendimento.</p>
+                        <span class="menu-card-arrow">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="menu-card" data-section="feesSection">
+                        <span class="menu-card-title">Tasse</span>
+                        <p class="menu-card-subtitle">Verifica lo stato dei pagamenti e salda i contributi universitari.</p>
+                        <span class="menu-card-arrow">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="menu-card" data-section="secretariatSection">
+                        <span class="menu-card-title">Segreteria</span>
+                        <p class="menu-card-subtitle">Informazioni e contatti utili per la segreteria studenti della tua facoltà.</p>
+                        <span class="menu-card-arrow">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="menu-card" data-section="contactsSection">
+                        <span class="menu-card-title">Contatti</span>
+                        <p class="menu-card-subtitle">Trova i contatti generali dell'Ateneo e degli uffici principali.</p>
+                        <span class="menu-card-arrow">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                            </svg>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Full Page Calendar Section -->
+            <div id="fullPageCalendarSection" class="content-section hidden p-6 space-y-6">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Calendario Accademico</h2>
+                <div class="full-page-calendar-section">
+                    <div class="calendar-header">
+                        <button id="prevMonth" class="text-gray-500 hover:text-gray-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                            </svg>
+                        </button>
+                        <span id="currentMonthYear">Luglio 2025</span>
+                        <button id="nextMonth" class="text-gray-500 hover:text-gray-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="calendar-grid" id="calendarGrid">
+                        <!-- Day names -->
+                        <div class="calendar-day-name">Lun</div>
+                        <div class="calendar-day-name">Mar</div>
+                        <div class="calendar-day-name">Mer</div>
+                        <div class="calendar-day-name">Gio</div>
+                        <div class="calendar-day-name">Ven</div>
+                        <div class="calendar-day-name">Sab</div>
+                        <div class="calendar-day-name">Dom</div>
+                        <!-- Days will be generated by JavaScript -->
+                    </div>
+                    <div class="flex justify-center mt-4">
+                        <button id="closeCalendar" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors">Torna Indietro</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Fixed Bottom Menu -->
+    <footer class="fixed bottom-0 left-0 right-0 w-full p-4 flex justify-around items-center text-sm footer-menu shadow-lg">
+        <button id="calendarButton" class="footer-link flex flex-col items-center px-2 py-1 rounded">
+            <!-- Icona Calendario con orologio spostato in basso -->
+            <svg width="36" height="36" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Calendar base -->
+                <path d="M24.75 6H5.25C4.00736 6 3 7.00736 3 8.25V24.75C3 25.9926 4.00736 27 5.25 27H24.75C25.9926 27 27 25.9926 27 24.75V8.25C27 7.00736 25.9926 6 24.75 6Z" stroke="#070707" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M21 3V9" stroke="#070707" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M9 3V9" stroke="#070707" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M3 15H27" stroke="#070707" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <!-- Small clock overlay - moved to bottom right -->
+                <circle cx="20" cy="20" r="5" fill="white" stroke="#070707" stroke-width="1.5"/>
+                <path d="M20 18V20.5H22" stroke="#070707" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
+        <button id="profileFooterButton" class="footer-link flex flex-col items-center px-2 py-1 rounded">
+            <svg width="67.2" height="67.2" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <filter id="shadowFilter">
+                        <feDropShadow dx="0.5" dy="0.5" stdDeviation="0.5" flood-color="#000000" flood-opacity="0.3"/>
+                    </filter>
+                    <linearGradient id="gradientBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <!-- Using Sapienza red and a lighter shade for the gradient -->
+                        <stop offset="0%" style="stop-color:#822434;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#a04050;stop-opacity:1" />
+                    </linearGradient>
+                    <clipPath id="circleClip">
+                        <!-- Clip path slightly smaller than the outer circle to leave space for the border -->
+                        <circle cx="15" cy="15" r="12.5"/>
+                    </clipPath>
+                </defs>
+
+                <!-- Main background circle (solid red, with shadow) -->
+                <circle cx="15" cy="15" r="14" fill="#822434" filter="url(#shadowFilter)"/>
+
+                <!-- Image inside the circle, clipped to be circular -->
+                <!-- x and y are (center - radius_for_clip_path) -->
+                <image href="https://i.ibb.co/BVjctdjZ/6041943612016675204-photoaidcom-cropped-1.png"
+                       x="2.5" y="2.5" width="25" height="25" clip-path="url(#circleClip)"/>
+
+                <!-- Gradient border circle (on top, with no fill) -->
+                <!-- Radius should be slightly less than the main circle's radius to appear as an inner border -->
+                <!-- Stroke width of 1px is applied to a circle with radius 13.5, making it appear within the r=14 circle -->
+                <circle cx="15" cy="15" r="13.5" fill="none" stroke="url(#gradientBorder)" stroke-width="1"/>
+            </svg>
+        </button>
+        <button id="menuFooterButton" class="footer-link flex flex-col items-center px-2 py-1 rounded">
+            <!-- Icona Menu (griglia 3x3 di quadratini rossi con vuoto all'interno) -->
+            <svg width="45" height="45" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="0" y="2" width="4" height="4" rx="1" stroke="#822434" stroke-width="1.75"/>
+                <rect x="7" y="2" width="4" height="4" rx="1" stroke="#822434" stroke-width="1.75"/>
+                <rect x="14" y="2" width="4" height="4" rx="1" stroke="#822434" stroke-width="1.75"/>
+                <rect x="0" y="9" width="4" height="4" rx="1" stroke="#822434" stroke-width="1.75"/>
+                <rect x="7" y="9" width="4" height="4" rx="1" stroke="#822434" stroke-width="1.75"/>
+                <rect x="14" y="9" width="4" height="4" rx="1" stroke="#822434" stroke-width="1.75"/>
+                <rect x="0" y="16" width="4" height="4" rx="1" stroke="#822434" stroke-width="1.75"/>
+                <rect x="7" y="16" width="4" height="4" rx="1" stroke="#822434" stroke-width="1.75"/>
+                <rect x="14" y="16" width="4" height="4" rx="1" stroke="#822434" stroke-width="1.75"/>
+            </svg>
+        </button>
+    </footer>
+
+    <!-- Sidebar Menu (now a full page content) -->
+    <!-- This div is no longer a sidebar, but a content section activated by the footer menu button -->
+    <div id="sidebarMenu" class="content-section hidden">
+        <!-- The content of this section is now handled by the menuPageSection -->
+    </div>
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-button" id="closePaymentModal">&times;</button>
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Attenzione!</h3>
+            <p class="text-lg text-gray-700">e cu quali soddi mbare</p>
+            <p class="text-sm text-gray-500 mt-4"> (Con quali soldi, amico?)</p>
+        </div>
+    </div>
+
+    <!-- Cancellation Confirmation Modal -->
+    <div id="cancelEnrollmentModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-button" id="closeCancelEnrollmentModal">&times;</button>
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Ne sei sicuro?</h3>
+            <p class="text-lg text-gray-700 mb-4">Io ci ripenserei...</p>
+            <!-- A generic warning icon or a silhouetted figure instead of a specific "man with a gun" -->
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 mx-auto text-[#822434] mb-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.38 3.375 2.07 3.375h14.006c1.69 0 2.936-1.875 2.069-3.376L12.707 5.624a1.125 1.125 0 00-1.994 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+            </svg>
+            <button class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-md transition-colors" id="confirmCancelEnrollment">Conferma Annullamento</button>
+        </div>
+    </div>
+
+    <!-- Micro Banner for "E invece no" -->
+    <div id="noCancellationModal" class="micro-banner-modal">
+        <p class="text-lg text-gray-800">E invece no, con una linguaccia! &#128540;</p>
+    </div>
+
+    <!-- Comment Modal -->
+    <div id="commentModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-button" id="closeCommentModal">&times;</button>
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Lascia un commento!</h3>
+            <textarea id="commentInput" class="w-full p-3 border border-gray-300 rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-[#822434]" rows="4" placeholder="Scrivi qui il tuo commento..."></textarea>
+            <button id="submitCommentButton" class="bg-[#822434] hover:bg-[#6a1d2b] text-white font-bold py-2 px-4 rounded-md transition-colors shadow-md">
+                Invia Commento
+            </button>
+        </div>
+    </div>
+
+    <!-- Search Results Modal -->
+    <div id="searchModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-button" id="closeSearchModal">&times;</button>
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Risultati di ricerca</h3>
+            <p id="searchQueryDisplay" class="text-lg text-gray-700 mb-4"></p>
+            <p class="text-md text-gray-600">Funzionalità di ricerca in fase di sviluppo. Nessuno risultato trovato per la tua ricerca.</p>
+        </div>
+    </div>
+
+    <script>
+        // Define exam dates for highlighting in the calendar
+        const examDates = [
+            "2025-07-15", // Storia delle Caccole Medievali
+            "2025-07-22", // Teoria del Rutto Libero
+            "2025-08-05", // Filosofia del Sonno Profondo
+            "2025-09-12", // Archeologia dei Calzini Spaiati
+            "2025-09-20"  // Metodologie della Siesta Perfetta
+        ];
+
+        // Calendar functionality
+        const calendarButton = document.getElementById('calendarButton');
+        // calendarModal is now fullPageCalendarSection
+        const fullPageCalendarSection = document.getElementById('fullPageCalendarSection');
+        const closeCalendar = document.getElementById('closeCalendar');
+        // calendarOverlay is no longer needed
+        const currentMonthYear = document.getElementById('currentMonthYear');
+        const prevMonthButton = document.getElementById('prevMonth');
+        const nextMonthButton = document.getElementById('nextMonth');
+        const calendarGrid = document.getElementById('calendarGrid');
+
+        let currentDate = new Date(); // Start with current date
+
+        function renderCalendar(date) {
+            calendarGrid.innerHTML = `
+                <div class="calendar-day-name">Lun</div>
+                <div class="calendar-day-name">Mar</div>
+                <div class="calendar-day-name">Mer</div>
+                <div class="calendar-day-name">Gio</div>
+                <div class="calendar-day-name">Ven</div>
+                <div class="calendar-day-name">Sab</div>
+                <div class="calendar-day-name">Dom</div>
+            `; // Reset grid and add day names
+
+            const year = date.getFullYear();
+            const month = date.getMonth(); // 0-indexed
+
+            // Set month and year in header
+            const monthNames = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
+                                "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
+            currentMonthYear.textContent = `${monthNames[month]} ${year}`;
+
+            // Get first day of the month (0=Sunday, 1=Monday, etc.)
+            const firstDayOfMonth = new Date(year, month, 1).getDay();
+            // Adjust to make Monday (1) the start of the week (0-indexed for array, so Monday is 0, Sunday is 6)
+            const startDayIndex = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
+
+            // Get number of days in current month
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            // Add empty days for the start of the month
+            for (let i = 0; i < startDayIndex; i++) {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.classList.add('calendar-day', 'empty');
+                calendarGrid.appendChild(emptyDiv);
+            }
+
+            // Add days of the month
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.classList.add('calendar-day');
+                dayDiv.textContent = i;
+
+                // Format the date for comparison with examDates array
+                const dayString = i.toString().padStart(2, '0');
+                const monthString = (month + 1).toString().padStart(2, '0');
+                const formattedDate = `${year}-${monthString}-${dayString}`;
+
+                if (examDates.includes(formattedDate)) {
+                    dayDiv.classList.add('exam-day'); // Highlight exam days
+                    dayDiv.addEventListener('click', () => {
+                        showMainContentSection('examRegistrationSection'); // Go to exam registration
+                        // No need to close calendar modal as it's a full page
+                    });
+                } else if (i === new Date().getDate() && month === new Date().getMonth() && year === new Date().getFullYear()) {
+                    dayDiv.classList.add('current-day'); // Highlight current day if not an exam day
+                }
+                calendarGrid.appendChild(dayDiv);
+            }
+        }
+
+        // Section visibility logic for main content area
+        const contentSections = document.querySelectorAll('.content-section');
+        const currentHeaderTitle = document.getElementById('currentHeaderTitle');
+        const leftProfileColumn = document.getElementById('leftProfileColumn');
+        const mainContentArea = document.getElementById('mainContentArea');
+
+        /**
+         * Shows a specific content section and updates browser history.
+         * @param {string} sectionId - The ID of the section to show.
+         * @param {boolean} pushState - Whether to push a new state to browser history. Default is true.
+         */
+        function showMainContentSection(sectionId, pushState = true) {
+            // Hide all content sections
+            contentSections.forEach(section => {
+                section.classList.add('hidden');
+            });
+            // Show the requested section
+            document.getElementById(sectionId).classList.remove('hidden');
+
+            // Scroll to the top of the main content area
+            mainContentArea.scrollTop = 0;
+            window.scrollTo(0, 0); // Also scroll the window to top in case of body scrolling
+
+            // Update browser history if pushState is true
+            if (pushState) {
+                // Push the current state to history. The URL hash will reflect the section ID.
+                history.pushState({ sectionId: sectionId }, '', `#${sectionId}`);
+            }
+
+            // Toggle visibility of the left profile column based on sectionId
+            if (sectionId === 'profileSection') {
+                leftProfileColumn.classList.remove('hidden');
+                mainContentArea.classList.remove('md:w-full');
+                mainContentArea.classList.add('flex-1');
+            } else {
+                leftProfileColumn.classList.add('hidden');
+                mainContentArea.classList.add('md:w-full');
+                mainContentArea.classList.remove('flex-1');
+            }
+
+            // Update header title based on active section
+            const sectionTitles = {
+                'profileSection': 'Dati personali',
+                'careerSection': 'Carriera',
+                'homeSection': 'Home',
+                'examsSection': 'Esami', // Updated title
+                'feesSection': 'Tasse',
+                'secretariatSection': 'Segreteria',
+                'contactsSection': 'Contatti',
+                'menuPageSection': 'Menu',
+                'examCalendarSection': 'Calendario Appelli',
+                'examRegistrationSection': 'Iscrizione Esami',
+                'resultsBoardSection': 'Bacheca Risultati',
+                'emailSection': 'Email',
+                'graduationSection': 'Laurearsi',
+                'abroadSection': 'Estero',
+                'dsaSection': 'Disabilità e DSA',
+                'azetaSection': 'AZETA Studenti',
+                'fullPageCalendarSection': 'Calendario Accademico', // New title for the full page calendar
+                'studentsPage': 'Studenti',
+                'graduatesPage': 'Laureati',
+                'teachersPage': 'Docenti',
+                'staffPage': 'Personale',
+                'contactsPage': 'Contatti Ateneo',
+                'newsArticle1': 'Borse di Studio',
+                'newsArticle2': 'Catalogo Competenze'
+            };
+            currentHeaderTitle.textContent = sectionTitles[sectionId] || 'Home';
+
+            // If the calendar section is opened, render it
+            if (sectionId === 'fullPageCalendarSection') {
+                renderCalendar(currentDate);
+            }
+        }
+
+        /**
+         * Navigates back in the browser's history.
+         * This function is triggered by the custom back arrow button.
+         */
+        function goBack() {
+            history.back();
+        }
+
+        // Payment Modal functionality
+        const payNowButton = document.getElementById('payNowButton');
+        const paymentModal = document.getElementById('paymentModal');
+        const closePaymentModal = document.getElementById('closePaymentModal');
+
+        function togglePaymentModal() {
+            paymentModal.classList.toggle('open');
+        }
+
+        // Cancellation Confirmation Modal functionality
+        const cancelEnrollmentButtons = document.querySelectorAll('.cancel-enrollment-button');
+        const cancelEnrollmentModal = document.getElementById('cancelEnrollmentModal');
+        const closeCancelEnrollmentModal = document.getElementById('closeCancelEnrollmentModal');
+        const confirmCancelEnrollmentButton = document.getElementById('confirmCancelEnrollment');
+        const noCancellationModal = document.getElementById('noCancellationModal'); // New micro banner
+
+        function toggleCancelEnrollmentModal() {
+            cancelEnrollmentModal.classList.toggle('open');
+        }
+
+        function showNoCancellationModal() {
+            noCancellationModal.classList.add('open');
+            setTimeout(() => {
+                noCancellationModal.classList.remove('open');
+            }, 2000); // Hide after 2 seconds
+        }
+
+        // Comment Modal functionality
+        const commentModal = document.getElementById('commentModal');
+        const closeCommentModal = document.getElementById('closeCommentModal');
+        const submitCommentButton = document.getElementById('submitCommentButton');
+        const commentInput = document.getElementById('commentInput');
+
+        function toggleCommentModal() {
+            commentModal.classList.toggle('open');
+            if (!commentModal.classList.contains('open')) {
+                commentInput.value = ''; // Clear input when closing
+            }
+        }
+
+        // Search Modal functionality
+        const siteSearchInput = document.getElementById('siteSearchInput');
+        const searchModal = document.getElementById('searchModal');
+        const closeSearchModal = document.getElementById('closeSearchModal');
+        const searchQueryDisplay = document.getElementById('searchQueryDisplay');
+
+        function toggleSearchModal(query = '') {
+            searchQueryDisplay.textContent = `Hai cercato: "${query}"`;
+            searchModal.classList.toggle('open');
+        }
+
+
+        // Ensure DOM is fully loaded before attaching event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            // Event listeners for footer buttons
+            // Calendar button now opens fullPageCalendarSection
+            calendarButton.addEventListener('click', () => showMainContentSection('fullPageCalendarSection'));
+            // Profile footer button now opens comment modal
+            document.getElementById('profileFooterButton').addEventListener('click', toggleCommentModal);
+            document.getElementById('menuFooterButton').addEventListener('click', () => showMainContentSection('menuPageSection'));
+
+            // Event listeners for menu page cards (main menu)
+            document.querySelectorAll('.menu-card').forEach(card => {
+                card.addEventListener('click', (event) => {
+                    const sectionId = event.currentTarget.dataset.section;
+                    showMainContentSection(sectionId);
+                });
+            });
+
+            // Event listeners for home icon cards (main home page)
+            document.querySelectorAll('.home-icon-card').forEach(card => {
+                card.addEventListener('click', (event) => {
+                    event.preventDefault(); // Prevent default link behavior
+                    const sectionId = event.currentTarget.dataset.section;
+                    showMainContentSection(sectionId);
+                });
+            });
+
+            // Event listeners for home navigation links (STUDENTI, LAUREATI, etc.)
+            document.querySelectorAll('.home-nav-link').forEach(link => {
+                link.addEventListener('click', (event) => {
+                    const sectionId = event.currentTarget.dataset.section;
+                    if (sectionId) { // Only navigate if data-section is defined
+                        event.preventDefault();
+                        showMainContentSection(sectionId);
+                    }
+                });
+            });
+
+            // Event listeners for news article links
+            document.querySelectorAll('.info-card a[data-section]').forEach(link => {
+                link.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const sectionId = event.currentTarget.dataset.section;
+                    showMainContentSection(sectionId);
+                });
+            });
+
+
+            // Event listener for the back arrow button in the header
+            document.getElementById('backArrowButton').addEventListener('click', goBack);
+
+            // Event listener for the home icon in the header (now leads to Home Sapienza)
+            document.getElementById('homeHeaderButton').addEventListener('click', () => {
+                // To go to home, we can simply replace the current history state with home,
+                // or if we want a clean slate, clear history and push home.
+                // For simplicity, let's just show home and replace the state.
+                history.replaceState({ sectionId: 'homeSection' }, '', '#homeSection');
+                showMainContentSection('homeSection', false); // Don't push state again
+            });
+
+            // New event listener for the exams header button
+            document.getElementById('examsHeaderButton').addEventListener('click', () => {
+                showMainContentSection('examsSection');
+            });
+
+            // Calendar specific listeners
+            // closeCalendar now navigates back
+            closeCalendar.addEventListener('click', goBack);
+            // calendarOverlay is removed, so no listener needed
+            prevMonthButton.addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() - 1);
+                renderCalendar(currentDate);
+            });
+            nextMonthButton.addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() + 1);
+                renderCalendar(currentDate);
+            });
+            // Initial render for the calendar is now done when the section is opened
+
+            // New event listeners for Exam section links
+            document.getElementById('examCalendarLink').addEventListener('click', (event) => {
+                event.preventDefault(); // Prevent default link behavior
+                showMainContentSection('examCalendarSection');
+            });
+
+            document.getElementById('examRegistrationLink').addEventListener('click', (event) => {
+                event.preventDefault();
+                showMainContentSection('examRegistrationSection');
+            });
+
+            document.getElementById('resultsBoardLink').addEventListener('click', (event) => {
+                event.preventDefault();
+                showMainContentSection('resultsBoardSection');
+            });
+
+            // Payment modal listeners
+            payNowButton.addEventListener('click', togglePaymentModal);
+            closePaymentModal.addEventListener('click', togglePaymentModal);
+            paymentModal.addEventListener('click', (event) => {
+                if (event.target === paymentModal) { // Close if clicked on overlay
+                    togglePaymentModal();
+                }
+            });
+
+            // Cancellation modal listeners
+            cancelEnrollmentButtons.forEach(button => {
+                button.addEventListener('click', toggleCancelEnrollmentModal);
+            });
+            closeCancelEnrollmentModal.addEventListener('click', toggleCancelEnrollmentModal);
+            cancelEnrollmentModal.addEventListener('click', (event) => {
+                if (event.target === cancelEnrollmentModal) {
+                    toggleCancelEnrollmentModal();
+                }
+            });
+            confirmCancelEnrollmentButton.addEventListener('click', () => {
+                // Close the "Are you sure?" modal
+                toggleCancelEnrollmentModal();
+                // Show the "E invece no" micro banner
+                showNoCancellationModal();
+                console.log("Annullamento iscrizione tentato, ma... no!");
+            });
+
+
+            // Comment modal listeners
+            closeCommentModal.addEventListener('click', toggleCommentModal);
+            submitCommentButton.addEventListener('click', () => {
+                console.log("Commento inviato:", commentInput.value);
+                toggleCommentModal(); // Close modal after submitting
+            });
+            commentModal.addEventListener('click', (event) => {
+                if (event.target === commentModal) { // Close if clicked on overlay
+                    toggleCommentModal();
+                }
+            });
+
+            // Site search input listener
+            siteSearchInput.addEventListener('keyup', (event) => {
+                if (event.key === 'Enter') {
+                    toggleSearchModal(siteSearchInput.value);
+                }
+            });
+            closeSearchModal.addEventListener('click', () => toggleSearchModal());
+            searchModal.addEventListener('click', (event) => {
+                if (event.target === searchModal) {
+                    toggleSearchModal();
+                }
+            });
+
+            // Handle browser popstate event (back/forward buttons)
+            window.addEventListener('popstate', (event) => {
+                if (event.state && event.state.sectionId) {
+                    showMainContentSection(event.state.sectionId, false); // Don't push state again
+                } else {
+                    // If no state is found (e.g., initial page load or going back past the first pushed state)
+                    showMainContentSection('homeSection', false);
+                }
+            });
+
+            // Initial load: check for hash in URL or default to home
+            const initialSection = window.location.hash ? window.location.hash.substring(1) : 'homeSection';
+            showMainContentSection(initialSection, true); // Push initial state
+        });
+    </script>
+</body>
+</html>
